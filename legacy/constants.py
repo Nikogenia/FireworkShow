@@ -1,0 +1,22 @@
+# IMPORTS
+
+
+# CONSTANTS
+
+# Credits
+AUTHOR: str = "Nikocraft"
+VERSION: str = "Beta 1.1"
+
+# Window
+WIN_MIN_WIDTH: int = 600
+WIN_MIN_HEIGHT: int = 450
+WIN_DEFAULT_WIDTH: int = 1000
+WIN_DEFAULT_HEIGHT: int = 750
+WIN_RENDER_FPS: int = 60
+WIN_RENDER_SPEED: float = 0.7
+
+# Render
+RENDER_MODE_REALTIME: int = 1
+RENDER_MODE_RENDER_IMG: int = 2
+RENDER_MODE_RENDER_VID: int = 3
+RENDER_RESOLUTION: tuple[int, int] = (1920, 1080)
