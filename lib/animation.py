@@ -9,7 +9,8 @@ class Animation:
 
         self.cursor = 0
 
-        self.rockets = []
+        self.rockets = {}
+        self.fountains = {}
 
     @property
     def size(self):
@@ -21,3 +22,17 @@ class Animation:
     def jump(self, frame):
         self.cursor = frame
 
+    def spawn_rocket(self, rocket):
+        if self.cursor not in self.rockets:
+            self.rockets[self.cursor] = []
+        self.rockets[self.cursor].append(rocket)
+
+    def explode_rocket(self, rocket):
+        if self.cursor - rocket.duration not in self.rockets:
+            self.rockets[self.cursor - rocket.duration] = []
+        self.rockets[self.cursor - rocket.duration].append(rocket)
+
+    def spawn_fountain(self, fountain):
+        if self.cursor not in self.fountains:
+            self.fountains[self.cursor] = []
+        self.fountains[self.cursor].append(fountain)

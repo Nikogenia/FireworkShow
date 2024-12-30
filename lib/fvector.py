@@ -59,7 +59,7 @@ class FVector(tuple):
     # OVERRIDE METHODS
 
     # String
-    def __str__(self):
+    def __repr__(self):
         return f"FVector[{self.x}|{self.y}|ID={id(self)}]"
 
     # Addition

@@ -32,7 +32,7 @@ class RGBColor(tuple):
     # OVERRIDE METHODS
 
     # String
-    def __str__(self) -> str:
+    def __repr__(self) -> str:
         return f"RGBColor[{self[0]}|{self[1]}|{self[2]}|ID={id(self)}]"
 
 

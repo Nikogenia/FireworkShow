@@ -1,10 +1,10 @@
 from .display import Display
 from .frame import Frame
-from . import color
 import threading as th
 import pygame as pg
 import time
 import psutil
+import signal
 
 
 class Show:
@@ -35,11 +35,18 @@ class Show:
             self.memory_limit = 200
         self.cache_id = 0
         self.last_cache_id = 0
-        self.cache_thread = th.Thread(target=self.clean_cache, name="cache thread")
+        self.cache_thread = th.Thread(target=self.clean_cache, name="cache thread", daemon=True)
 
         self.process = psutil.Process()
         self.cpu_usage = 0
         self.memory_usage = 0
+
+        self.timings_rocket_update = 0
+        self.timings_fountain_update = 0
+        self.timings_rocket_render = 0
+        self.timings_fountain_render = 0
+        self.timings_active_backend = 0
+        self.timings_backend = 0
 
     @property
     def frame(self):
@@ -47,12 +54,18 @@ class Show:
 
     def preview(self):
 
+        signal.signal(signal.SIGINT, self.quit)
+
         self.display.start()
         self.cache_thread.start()
 
+        timings_backend = time.perf_counter()
+
         while self.display.running:
 
+            self.timings_backend = time.perf_counter() - timings_backend
             self.clock.tick(self.animation.fps)
+            timings_backend = time.perf_counter()
 
             if self.playing:
                 self.cursor += 1
@@ -61,22 +74,67 @@ class Show:
             if self.cursor > self.animation.length:
                 self.cursor = 0
 
+            timings_active_backend = time.perf_counter()
+
             if self.frame is not None:
+
                 if self.frame.surface is not None:
                     self.surface = self.frame.surface
                     continue
                 if self.last_cursor == self.cursor:
                     continue
+
                 rockets = self.frame.rockets
+                fountains = self.frame.fountains
+
             else:
+
                 previous = self.frames[self.cursor - 1]
-                rockets = previous.rockets if previous is not None and self.cursor > 0 else []            
+                if previous is not None and self.cursor > 0:
+                    rockets = [rocket.copy(True) for rocket in previous.rockets]
+                    fountains = [fountain.copy(True) for fountain in previous.fountains]
+                else:
+                    rockets = []
+                    fountains = []
+
+                if self.cursor in self.animation.rockets:
+                    for rocket in self.animation.rockets[self.cursor]:
+                        rockets.append(rocket.copy())
+                if self.cursor in self.animation.fountains:
+                    for fountain in self.animation.fountains[self.cursor]:
+                        fountains.append(rocket.copy())
+
+                timings_rocket_update = time.perf_counter()
+                to_remove = []
+                for rocket in rockets:
+                    if not rocket.update():
+                        to_remove.append(rocket)
+                for rocket in to_remove:
+                    rockets.remove(rocket)
+                self.timings_rocket_update = time.perf_counter() - timings_rocket_update
+
+                timings_fountain_update = time.perf_counter()
+                to_remove = []
+                for fountain in fountains:
+                    if fountain.update():
+                        to_remove.append(fountain)
+                for fountain in to_remove:
+                    fountains.remove(fountain)
+                self.timings_fountain_update = time.perf_counter() - timings_fountain_update
 
             surface = pg.Surface(self.animation.size)
 
-            #RENDER
-        
-            frame = Frame(surface if self.cache else None, rockets, self.cache_id)
+            timings_rocket_render = time.perf_counter()
+            for rocket in rockets:
+                rocket.render(surface)
+            self.timings_rocket_render = time.perf_counter() - timings_rocket_render
+
+            timings_fountain_render = time.perf_counter()
+            for fountain in fountains:
+                fountain.render(surface)
+            self.timings_fountain_render = time.perf_counter() - timings_fountain_render
+
+            frame = Frame(surface if self.cache else None, rockets, fountains, self.cache_id)
             if self.cache:
                 self.cache_id += 1
             self.last_cursor = self.cursor
@@ -86,29 +144,25 @@ class Show:
             self.surface = surface
             self.display.do_render = True
 
+            self.timings_active_backend = time.perf_counter() - timings_active_backend
+
     def render(self):
 
         pass
 
     def toggle_cache(self):
 
-        if self.cache:
-            self.cache = False
-            self.cache_id = 0
-            self.last_cache_id = 0
-            self.frames = [None] * (self.animation.length + 1)
-            print("Cache reset and disabled")
-            return
-        
-        self.cache = True
-        print("Cache reset and enabled")
+        self.cache = not self.cache
+        self.cache_id = 0
+        self.last_cache_id = 0
+        self.frames = [None] * (self.animation.length + 1)
 
     def clean_cache(self):
 
         next_clean = 0
         next_cpu = 0
 
-        while self.display.running:
+        while self.display.running and th.main_thread().is_alive():
 
             self.memory_usage = self.process.memory_info().rss / 1024 / 1024
             
@@ -134,3 +188,9 @@ class Show:
             for frame in self.frames:
                 if frame is not None and frame.cache_id < self.last_cache_id:
                     frame.surface = None
+
+    def quit(self, signum, frame):
+
+        self.display.running = False
+        self.display.join()
+        self.cache_thread.join()
