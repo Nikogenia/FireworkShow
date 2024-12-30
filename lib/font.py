@@ -36,7 +36,7 @@ HP_SIMPLIFIED_18 = load_file_font(font_path + "hpsimplifiedjpan-regular.ttf", 18
 #HP_SIMPLIFIED_20 = load_file_font(font_path + "hpsimplifiedjpan-regular.ttf", 20)
 #HP_SIMPLIFIED_22 = load_file_font(font_path + "hpsimplifiedjpan-regular.ttf", 22)
 #HP_SIMPLIFIED_25 = load_file_font(font_path + "hpsimplifiedjpan-regular.ttf", 25)
-#HP_SIMPLIFIED_30 = load_file_font(font_path + "hpsimplifiedjpan-regular.ttf", 30)
+HP_SIMPLIFIED_30 = load_file_font(font_path + "hpsimplifiedjpan-regular.ttf", 30)
 #HP_SIMPLIFIED_35 = load_file_font(font_path + "hpsimplifiedjpan-regular.ttf", 35)
 
 #NOTOMONO_12 = load_file_font(font_path + "NotoMono-Regular.ttf", 12)

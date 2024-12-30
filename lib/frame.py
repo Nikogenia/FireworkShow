@@ -13,6 +13,12 @@ class Frame:
 
     cache_id: int
 
+    timings_active_backend: float
+    timings_rocket_update: float
+    timings_fountain_update: float
+    timings_rocket_render: float
+    timings_fountain_render: float
+
     @property
     def particles(self):
         particles = []

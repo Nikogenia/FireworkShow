@@ -15,7 +15,7 @@ class Rocket:
 
     def __init__(self, explosion: BasicExplosion | ImageExplosion,
                  pos: FVector, start: FVector, duration: int,
-                 curve: float = 2, launch_sizes: list[int] = [2, 3],
+                 curve_x: float = 1, curve_y: float = 4, launch_sizes: list[int] = [2, 3],
                  launch_colors: list[RGBColor] = ROCKET_LAUNCH_COLORS,
                  launch_handler: Callable = rocket_launch) -> None:
 
@@ -23,7 +23,8 @@ class Rocket:
         self.pos = pos
         self.start = start
         self.duration = duration
-        self.curve = curve
+        self.curve_x = curve_x
+        self.curve_y = curve_y	
         self.launch_sizes = launch_sizes
         self.launch_colors = launch_colors
         self.launch_handler = launch_handler
@@ -49,12 +50,14 @@ class Rocket:
         
             return bool(self.particles)
         
-        factor = (1 - self.cursor / self.duration) ** self.curve
-        offset = (self.start - self.pos) * factor
-        pos = self.pos + offset
+        factor_increasing = (self.cursor / self.duration) ** self.curve_x
+        factor_decreasing = (1 - self.cursor / self.duration) ** self.curve_y
+        offset_x = (self.pos - self.start).x * factor_increasing
+        offset_y = (self.start - self.pos).y * factor_decreasing
+        pos = FVector(self.start.x + offset_x, self.pos.y + offset_y)
 
-        for i in range(int(rd.random() * factor * 30)):
-            self.particles.append(PointParticle(pos, FVector(rd.random() * 1.5 - 0.75, rd.randint(2, 3)),
+        for i in range(int(rd.random() * (factor_decreasing * 30 + 2))):
+            self.particles.append(PointParticle(pos.update_y(rd.random() * 40 * factor_decreasing), FVector(rd.random() * 1.5 - 0.75, rd.random() * 5),
                                                 rd.choice(self.launch_sizes), rd.choice(self.launch_colors),
                                                 self.launch_handler))
 
@@ -69,7 +72,7 @@ class Rocket:
 
     def copy(self, state=False) -> Self:
         rocket = Rocket(self.explosion, self.pos, self.start, self.duration,
-                        self.curve, self.launch_sizes, self.launch_colors, self.launch_handler)
+                        self.curve_x, self.curve_y, self.launch_sizes, self.launch_colors, self.launch_handler)
         if state:
             rocket.cursor = self.cursor
             rocket.exploded = self.exploded

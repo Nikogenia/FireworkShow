@@ -4,16 +4,14 @@ from lib.color import *
 
 def scene_1():
 
-    animation.wait(10)
-
-    explosion = lib.BasicExplosion([RED, ORANGE, YELLOW])
-    rocket = lib.Rocket(explosion, lib.FVector(1920/2, 400), lib.FVector(1920/2 - 50, 1100), 50)
+    explosion = lib.BasicExplosion([RED, ORANGE, YELLOW], scale=2, strength=4)
+    rocket = lib.Rocket(explosion, lib.FVector(1200, 400), lib.FVector(1140, 1100), 120)
     animation.spawn_rocket(rocket)
 
     
 if __name__ == '__main__':
 
-    animation = lib.Animation(1920, 1080, 30, 150)
+    animation = lib.Animation(1920, 1080, 60, 300)
 
     scene_1()
 
