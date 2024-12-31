@@ -11,7 +11,7 @@ from .vector import Vector
 from .fvector import FVector
 from . import font, draw, color, particle_handler, image
 
-from .explosion import BasicExplosion, ImageExplosion
+from .explosion import BasicExplosion, ImageExplosion, LineExplosion
 from .rocket import Rocket
 from .fountain import Fountain
 from .particle import PointParticle

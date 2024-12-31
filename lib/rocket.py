@@ -1,7 +1,7 @@
 from .fvector import FVector
 from .color import *
 from .particle import PointParticle
-from .explosion import BasicExplosion, ImageExplosion
+from .explosion import BasicExplosion, ImageExplosion, LineExplosion
 from .particle_handler import rocket_launch
 import random as rd
 import pygame as pg
@@ -13,13 +13,13 @@ ROCKET_LAUNCH_COLORS = [WHITE, LIGHT_YELLOW, YELLOW, DARK_YELLOW, ORANGE]
 
 class Rocket:
 
-    def __init__(self, explosion: BasicExplosion | ImageExplosion,
+    def __init__(self, explosions: list[BasicExplosion | ImageExplosion | LineExplosion],
                  pos: FVector, start: FVector, duration: int,
                  curve_x: float = 1, curve_y: float = 4, launch_sizes: list[int] = [2, 3],
                  launch_colors: list[RGBColor] = ROCKET_LAUNCH_COLORS,
                  launch_handler: Callable = rocket_launch) -> None:
 
-        self.explosion = explosion
+        self.explosions = explosions
         self.pos = pos
         self.start = start
         self.duration = duration
@@ -46,7 +46,8 @@ class Rocket:
 
             if not self.exploded:
                 self.exploded = True
-                self.particles.extend(self.explosion.generate_particles(self.pos))
+                for explosion in self.explosions:
+                    self.particles.extend(explosion.generate_particles(self.pos))
         
             return bool(self.particles)
         
@@ -71,7 +72,7 @@ class Rocket:
             particle.draw(surface)
 
     def copy(self, state=False) -> Self:
-        rocket = Rocket(self.explosion, self.pos, self.start, self.duration,
+        rocket = Rocket(self.explosions, self.pos, self.start, self.duration,
                         self.curve_x, self.curve_y, self.launch_sizes, self.launch_colors, self.launch_handler)
         if state:
             rocket.cursor = self.cursor
