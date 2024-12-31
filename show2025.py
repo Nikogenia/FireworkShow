@@ -333,6 +333,10 @@ def scene_5():
 
     animation.jump(frame=6, second=33)
 
+    explosion = lib.ImageExplosion(y2024_green, scale=2, strength=0.5)
+    rocket = lib.Rocket([explosion], lib.FVector(960 - 500, 400 - 100), lib.FVector(960 - 100, 1100), 140)
+    animation.explode_rocket(rocket)
+
     fountain = lib.Fountain(lib.FVector(960 + 100, 1070), 290, 150, [YELLOW, ORANGE, RED, PURPLE, BLUE, AQUA, GREEN, LIME], [2, 3, 4], scale=1, strength=1, spread=1)
     animation.spawn_fountain(fountain)
     fountain = lib.Fountain(lib.FVector(960 - 100, 1070), 250, 150, [YELLOW, ORANGE, RED, PURPLE, BLUE, AQUA, GREEN, LIME], [2, 3, 4], scale=1, strength=1, spread=1)
@@ -355,7 +359,45 @@ def scene_5():
     animation.spawn_fountain(fountain)
     fountain = lib.Fountain(lib.FVector(960 - 700, 1070), 240, 150, [YELLOW, ORANGE, RED, PURPLE, BLUE, AQUA, GREEN, LIME], [2, 3, 4], scale=1, strength=1, spread=1)
     animation.spawn_fountain(fountain)
+    
+    animation.jump(frame=49, second=34)
+
+    explosion = lib.ImageExplosion(a_aqua, scale=2, strength=0.5)
+    rocket = lib.Rocket([explosion], lib.FVector(960 + 400, 400 - 200), lib.FVector(960 + 100, 1100), 140)
+    animation.explode_rocket(rocket)
     animation.wait(25)
+
+    explosion = lib.ImageExplosion(year_aqua, scale=2, strength=0.5)
+    rocket = lib.Rocket([explosion], lib.FVector(960 + 100, 400), lib.FVector(960 + 50, 1100), 130)
+    animation.explode_rocket(rocket)
+    animation.wait(25)
+
+    explosion = lib.ImageExplosion(is_aqua, scale=2, strength=0.5)
+    rocket = lib.Rocket([explosion], lib.FVector(960 + 700, 400 + 100), lib.FVector(960 + 150, 1100), 120)
+    animation.explode_rocket(rocket)
+    animation.wait(50)
+
+    explosion = lib.ImageExplosion(over_blue, scale=2, strength=0.5)
+    rocket = lib.Rocket([explosion], lib.FVector(960 + 200, 400 + 300), lib.FVector(960, 1100), 110)
+    animation.explode_rocket(rocket)
+    
+    animation.jump(frame=25, second=37)
+
+    explosion = lib.LineExplosion([LIGHT_BLUE, LIGHT_AQUA, YELLOW, LIGHT_YELLOW, WHITE], lines=15, scale=1.5, strength=2)
+    rocket = lib.Rocket([explosion], lib.FVector(960 - 300, 400 - 100), lib.FVector(960 + 50, 1100), 120)
+    animation.explode_rocket(rocket)
+
+    explosion = lib.LineExplosion([LIGHT_BLUE, LIGHT_AQUA, YELLOW, LIGHT_YELLOW, WHITE], lines=15, scale=1.5, strength=2)
+    rocket = lib.Rocket([explosion], lib.FVector(960 + 300, 400 - 100), lib.FVector(960 - 50, 1100), 120)
+    animation.explode_rocket(rocket)
+
+
+def scene_6():
+
+    animation.jump(frame=32, second=38)
+
+    explosion = lib.ImageExplosion(heart_red, scale=2, strength=0.5)
+    rocket = lib.Rocket([explosion], lib.FVector(960 - 400, 400 - 100), lib.FVector(960 - 100, 1100), 140)
 
 
     
@@ -378,14 +420,15 @@ if __name__ == '__main__':
     new_red = pg.image.load("./images/new-red.png")
     year_red = pg.image.load("./images/year-red.png")
 
-    #animation = lib.Animation(1920, 1080, 60, 1800, 0)
-    animation = lib.Animation(1920, 1080, 60, 700, 1500)
+    #animation = lib.Animation(1920, 1080, 60, 2500, 0)
+    animation = lib.Animation(1920, 1080, 60, 700, 1700)
 
     scene_1() 
     scene_2()
     scene_3()
     scene_4()
     scene_5()
+    scene_6()
 
     show = lib.Show(animation,
                     name="Firework Show 2025",
