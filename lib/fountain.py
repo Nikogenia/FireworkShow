@@ -11,7 +11,7 @@ from typing import Callable, Self
 class Fountain:
 
     def __init__(self, pos: FVector, angle: int, duration: int,
-                 colors: list[RGBColor], sizes: list[int] = [3, 4, 5, 6],
+                 colors: list[RGBColor], sizes: list[int] = [2, 3, 3, 4, 4, 5],
                  scale: float = 1, strength: float = 1, spread: float = 1,
                  handler: Callable = fountain_basic) -> None:
 

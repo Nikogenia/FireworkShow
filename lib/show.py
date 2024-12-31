@@ -322,7 +322,8 @@ class Show:
         video = VideoFileClip(f"./out/{self.name} - no music.mp4")
         audio = AudioFileClip(self.music_path)
 
-        audio = audio.subclipped(self.animation.offset + self.music_offset, video.duration)
+        offset = (self.animation.offset + self.music_offset) / self.animation.fps
+        audio = audio.subclipped(offset, offset + video.duration)
 
         video = video.with_audio(audio)
 

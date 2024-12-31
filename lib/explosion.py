@@ -10,7 +10,7 @@ from typing import Callable
 
 class BasicExplosion:
 
-    def __init__(self, colors: list[RGBColor], sizes: list[int] = [3, 4, 5, 6], scale: float = 1, strength: float = 1, handler: Callable = rocket_basic_explosion) -> None:
+    def __init__(self, colors: list[RGBColor], sizes: list[int] = [2, 2, 3, 3, 3, 4, 4, 5, 6], scale: float = 1, strength: float = 1, handler: Callable = rocket_basic_explosion) -> None:
 
         self.colors = colors
         self.sizes = sizes
@@ -32,7 +32,7 @@ class BasicExplosion:
 
 class ImageExplosion:
 
-    def __init__(self, image: pg.Surface, sizes: list[int] = [3, 4, 5, 6], scale: float = 1, strength: float = 1, handler: Callable = rocket_image_explosion) -> None:
+    def __init__(self, image: pg.Surface, sizes: list[int] = [2, 2, 3, 3, 3, 4, 4, 5, 6], scale: float = 1, strength: float = 1, handler: Callable = rocket_image_explosion) -> None:
 
         self.image = image
         self.sizes = sizes
@@ -63,7 +63,7 @@ class ImageExplosion:
 
 class LineExplosion:
 
-    def __init__(self, colors: list[RGBColor], sizes: list[int] = [2, 3, 4], scale: float = 1, strength: float = 1, lines: int = 10, handler: Callable = rocket_line_explosion) -> None:
+    def __init__(self, colors: list[RGBColor], sizes: list[int] = [2, 2, 3, 3, 4], scale: float = 1, strength: float = 1, lines: int = 10, handler: Callable = rocket_line_explosion) -> None:
 
         self.colors = colors
         self.sizes = sizes

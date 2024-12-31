@@ -46,7 +46,7 @@ class Display(th.Thread):
     def run(self):
 
         self.window = pg.Window(f"{self.show.name} {self.show.version} - {self.show.author}",
-                                resizable=True)
+                                resizable=True, maximized=True)
 
         self.screen = self.window.get_surface()
 
@@ -58,6 +58,9 @@ class Display(th.Thread):
 
             for event in pg.event.get():
                 self.process_event(event)
+
+            if not self.running:
+                break
 
             if self.do_render:
                 self.do_render = False
