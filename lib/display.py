@@ -165,7 +165,7 @@ class Display(th.Thread):
             self.screen.blit(right_text, (self.width - 6 - text_width, self.height - 15 - text_height // 2))
             text = f"Particles: {self.show.particle_count}    Rockets: {self.show.rocket_count}    Fountains: {self.show.fountain_count}    "
             text += f"Display: {self.width} x {self.height}  {round(self.clock.get_fps())} FPS    "
-            text += f"Animation: {self.show.animation.width} x {self.show.animation.height}  {self.show.animation.fps} FPS    "
+            text += f"Animation: {self.show.animation.width} x {self.show.animation.height}  {round(self.show.clock.get_fps()) if self.show.mode == MODE_PREVIEW else self.show.animation.fps} FPS    "
             if self.show.mode == MODE_PREVIEW:
                 if self.show.cache:
                     text += f"Cache: {self.show.last_cache_id} - {self.show.cache_id}    "

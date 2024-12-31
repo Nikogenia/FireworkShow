@@ -18,7 +18,7 @@ class Show:
 
     def __init__(self, animation,
                  name="Firework Show", version="1.0", author="Nikogenia",
-                 cache=False, memory_limit=2000, music_path=None):
+                 cache=False, memory_limit=2000, music_path=None, music_offset=0):
 
         self.name = name
         self.version = version
@@ -28,6 +28,7 @@ class Show:
 
         self.animation = animation
         self.music_path = music_path
+        self.music_offset = music_offset
 
         self.mode = MODE_PREVIEW
         self.frames = [None] * (self.animation.length + 1)
@@ -321,7 +322,7 @@ class Show:
         video = VideoFileClip(f"./out/{self.name} - no music.mp4")
         audio = AudioFileClip(self.music_path)
 
-        audio = audio.subclipped(0, video.duration)
+        audio = audio.subclipped(self.animation.offset + self.music_offset, video.duration)
 
         video = video.with_audio(audio)
 

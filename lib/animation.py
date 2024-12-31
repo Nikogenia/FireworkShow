@@ -1,11 +1,12 @@
 class Animation:
 
-    def __init__(self, width, height, fps, length):
+    def __init__(self, width, height, fps, length, offset=0):
 
         self.width = width
         self.height = height
         self.fps = fps
         self.length = length
+        self.offset = offset
 
         self.cursor = 0
 
@@ -19,8 +20,8 @@ class Animation:
     def wait(self, frames):
         self.cursor += frames
 
-    def jump(self, frame):
-        self.cursor = frame
+    def jump(self, frame, second=0, minute=0):
+        self.cursor = int(frame + second * self.fps + minute * self.fps * 60) - self.offset
 
     def spawn_rocket(self, rocket):
         if self.cursor not in self.rockets:
