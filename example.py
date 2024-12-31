@@ -58,6 +58,7 @@ if __name__ == '__main__':
                     version="1.0",
                     author="Nikogenia",
                     cache=False,
-                    memory_limit=2000)
+                    memory_limit=2000,
+                    music_path="./music/new-year-bells.mp3")
 
     show.preview()

@@ -157,6 +157,8 @@ class Display(th.Thread):
                 text = "RENDERING VIDEO"
             elif self.show.mode == MODE_RENDER_IMAGE:
                 text = "RENDERING IMAGES"
+            if self.show.music_thread and self.show.music_thread.is_alive():
+                text += " / ADDING MUSIC"
             text += f"    Frame {self.show.cursor} / {self.show.animation.length}"
             text += f"    Time: {self.show.cursor / self.show.animation.fps:.2f}s / {self.show.animation.length / self.show.animation.fps:.2f}s"
             right_text, text_width, text_height = font.render_text(text, font.HP_SIMPLIFIED_18, color.WHITE)

@@ -6,16 +6,19 @@ import pygame as pg
 import cv2
 import time
 import os
+import shutil
+import traceback
 import psutil
 import signal
 import queue
+from moviepy import VideoFileClip, AudioFileClip   
 
 
 class Show:
 
     def __init__(self, animation,
                  name="Firework Show", version="1.0", author="Nikogenia",
-                 cache=False, memory_limit=2000):
+                 cache=False, memory_limit=2000, music_path=None):
 
         self.name = name
         self.version = version
@@ -24,6 +27,7 @@ class Show:
         self.display = Display(self)
 
         self.animation = animation
+        self.music_path = music_path
 
         self.mode = MODE_PREVIEW
         self.frames = [None] * (self.animation.length + 1)
@@ -41,6 +45,7 @@ class Show:
         self.cache_id = 0
         self.last_cache_id = 0
         self.cache_thread = th.Thread(target=self.clean_cache, name="cache thread", daemon=True)
+        self.music_thread = None
 
         self.process = psutil.Process()
         self.cpu_usage = 0
@@ -135,42 +140,9 @@ class Show:
                     rockets = []
                     fountains = []
 
-                if self.cursor in self.animation.rockets:
-                    for rocket in self.animation.rockets[self.cursor]:
-                        rockets.append(rocket.copy())
-                if self.cursor in self.animation.fountains:
-                    for fountain in self.animation.fountains[self.cursor]:
-                        fountains.append(fountain.copy())
-
-                timings_rocket_update = time.perf_counter()
-                to_remove = []
-                for rocket in rockets:
-                    if not rocket.update():
-                        to_remove.append(rocket)
-                for rocket in to_remove:
-                    rockets.remove(rocket)
-                self.timings_rocket_update = time.perf_counter() - timings_rocket_update
-
-                timings_fountain_update = time.perf_counter()
-                to_remove = []
-                for fountain in fountains:
-                    if not fountain.update():
-                        to_remove.append(fountain)
-                for fountain in to_remove:
-                    fountains.remove(fountain)
-                self.timings_fountain_update = time.perf_counter() - timings_fountain_update
-
-            surface = pg.Surface(self.animation.size)
-
-            timings_rocket_render = time.perf_counter()
-            for rocket in rockets:
-                rocket.render(surface)
-            self.timings_rocket_render = time.perf_counter() - timings_rocket_render
-
-            timings_fountain_render = time.perf_counter()
-            for fountain in fountains:
-                fountain.render(surface)
-            self.timings_fountain_render = time.perf_counter() - timings_fountain_render
+                self.backend_update(rockets, fountains)
+            
+            surface = self.backend_render(rockets, fountains)
 
             self.timings_active_backend = time.perf_counter() - timings_active_backend
 
@@ -223,42 +195,9 @@ class Show:
 
             timings_active_backend = time.perf_counter()
 
-            if self.cursor in self.animation.rockets:
-                for rocket in self.animation.rockets[self.cursor]:
-                    rockets.append(rocket.copy())
-            if self.cursor in self.animation.fountains:
-                for fountain in self.animation.fountains[self.cursor]:
-                    fountains.append(fountain.copy())
-
-            timings_rocket_update = time.perf_counter()
-            to_remove = []
-            for rocket in rockets:
-                if not rocket.update():
-                    to_remove.append(rocket)
-            for rocket in to_remove:
-                rockets.remove(rocket)
-            self.timings_rocket_update = time.perf_counter() - timings_rocket_update
-
-            timings_fountain_update = time.perf_counter()
-            to_remove = []
-            for fountain in fountains:
-                if not fountain.update():
-                    to_remove.append(fountain)
-            for fountain in to_remove:
-                fountains.remove(fountain)
-            self.timings_fountain_update = time.perf_counter() - timings_fountain_update
-
-            surface = pg.Surface(self.animation.size)
-
-            timings_rocket_render = time.perf_counter()
-            for rocket in rockets:
-                rocket.render(surface)
-            self.timings_rocket_render = time.perf_counter() - timings_rocket_render
-
-            timings_fountain_render = time.perf_counter()
-            for fountain in fountains:
-                fountain.render(surface)
-            self.timings_fountain_render = time.perf_counter() - timings_fountain_render
+            self.backend_update(rockets, fountains)
+            
+            surface = self.backend_render(rockets, fountains)
 
             try:
                 self.save_queue.put((image, video, self.cursor, self.surface), timeout=5)
@@ -294,7 +233,53 @@ class Show:
         if not image:
             video.release()
 
-        print(f"Rendering finished in {self.timings_backend:.2f}s")
+        print(f"Rendering finished in {self.timings_backend:.2f}s")        
+
+        self.music_thread = th.Thread(target=self.music, name="music thread", daemon=True)
+        self.music_thread.start()
+
+    def backend_update(self, rockets, fountains):
+
+        if self.cursor in self.animation.rockets:
+            for rocket in self.animation.rockets[self.cursor]:
+                rockets.append(rocket.copy())
+        if self.cursor in self.animation.fountains:
+            for fountain in self.animation.fountains[self.cursor]:
+                fountains.append(fountain.copy())
+
+        timings_rocket_update = time.perf_counter()
+        to_remove = []
+        for rocket in rockets:
+            if not rocket.update():
+                to_remove.append(rocket)
+        for rocket in to_remove:
+            rockets.remove(rocket)
+        self.timings_rocket_update = time.perf_counter() - timings_rocket_update
+
+        timings_fountain_update = time.perf_counter()
+        to_remove = []
+        for fountain in fountains:
+            if not fountain.update():
+                to_remove.append(fountain)
+        for fountain in to_remove:
+            fountains.remove(fountain)
+        self.timings_fountain_update = time.perf_counter() - timings_fountain_update
+
+    def backend_render(self, rockets, fountains):
+
+        surface = pg.Surface(self.animation.size)
+
+        timings_rocket_render = time.perf_counter()
+        for rocket in rockets:
+            rocket.render(surface)
+        self.timings_rocket_render = time.perf_counter() - timings_rocket_render
+
+        timings_fountain_render = time.perf_counter()
+        for fountain in fountains:
+            fountain.render(surface)
+        self.timings_fountain_render = time.perf_counter() - timings_fountain_render
+
+        return surface
 
     def save(self):
             
@@ -323,6 +308,26 @@ class Show:
                 self.timings_write = time.perf_counter() - timings_write
 
             self.save_queue.task_done()
+
+    def music(self):
+
+        if not self.music_path:
+            return
+
+        print(f"Adding music from {self.music_path} to the show")
+
+        shutil.copyfile(f"./out/{self.name}.mp4", f"./out/{self.name} - no music.mp4")
+
+        video = VideoFileClip(f"./out/{self.name} - no music.mp4")
+        audio = AudioFileClip(self.music_path)
+
+        audio = audio.subclipped(0, video.duration)
+
+        video = video.with_audio(audio)
+
+        video.write_videofile(f"./out/{self.name}.mp4", codec="libx264", audio_codec="aac")
+
+        print("Music added")
 
     def toggle_cache(self):
 
