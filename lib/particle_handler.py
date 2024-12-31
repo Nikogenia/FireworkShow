@@ -17,7 +17,7 @@ def rocket_basic_explosion(particle: PointParticle) -> None:
 def rocket_image_explosion(particle: PointParticle) -> None:
 
     particle.vel = particle.vel.update_y(rd.random() / 20)
-    particle.size -= rd.random() / 18
+    particle.size -= rd.random() / 25
 
 
 def rocket_line_explosion(particle: PointParticle) -> None:

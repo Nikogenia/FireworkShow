@@ -164,8 +164,11 @@ class Display(th.Thread):
             text = f"Particles: {self.show.particle_count}    Rockets: {self.show.rocket_count}    Fountains: {self.show.fountain_count}    "
             text += f"Display: {self.width} x {self.height}  {round(self.clock.get_fps())} FPS    "
             text += f"Animation: {self.show.animation.width} x {self.show.animation.height}  {self.show.animation.fps} FPS    "
-            if self.show.cache:
-                text += f"Cache: {self.show.last_cache_id} - {self.show.cache_id}    "
+            if self.show.mode == MODE_PREVIEW:
+                if self.show.cache:
+                    text += f"Cache: {self.show.last_cache_id} - {self.show.cache_id}    "
+            else:
+                text += f"Queue: {self.show.save_queue.qsize()} / {self.show.save_queue.maxsize}    "
             text += f"CPU: {self.show.cpu_usage:.1f}%    Memory: {self.show.memory_usage:.1f} MB"
             char_width = font.HP_SIMPLIFIED_18.size(text)[0] // len(text)
             max_chars = (self.width - text_width - 50) // char_width

@@ -140,7 +140,7 @@ class Show:
                         rockets.append(rocket.copy())
                 if self.cursor in self.animation.fountains:
                     for fountain in self.animation.fountains[self.cursor]:
-                        fountains.append(rocket.copy())
+                        fountains.append(fountain.copy())
 
                 timings_rocket_update = time.perf_counter()
                 to_remove = []
@@ -154,7 +154,7 @@ class Show:
                 timings_fountain_update = time.perf_counter()
                 to_remove = []
                 for fountain in fountains:
-                    if fountain.update():
+                    if not fountain.update():
                         to_remove.append(fountain)
                 for fountain in to_remove:
                     fountains.remove(fountain)
@@ -206,7 +206,7 @@ class Show:
             fourcc = cv2.VideoWriter_fourcc(*"mp4v")
             video = cv2.VideoWriter(f"./out/{self.name}.mp4", fourcc, self.animation.fps, self.animation.size)
 
-        self.save_queue = queue.Queue(30)
+        self.save_queue = queue.Queue(150)
         save_thread = th.Thread(target=self.save, name="save thread", daemon=True)
         save_thread.start()
 
@@ -228,7 +228,7 @@ class Show:
                     rockets.append(rocket.copy())
             if self.cursor in self.animation.fountains:
                 for fountain in self.animation.fountains[self.cursor]:
-                    fountains.append(rocket.copy())
+                    fountains.append(fountain.copy())
 
             timings_rocket_update = time.perf_counter()
             to_remove = []
@@ -242,7 +242,7 @@ class Show:
             timings_fountain_update = time.perf_counter()
             to_remove = []
             for fountain in fountains:
-                if fountain.update():
+                if not fountain.update():
                     to_remove.append(fountain)
             for fountain in to_remove:
                 fountains.remove(fountain)
@@ -284,6 +284,8 @@ class Show:
 
             self.timings_backend = time.perf_counter() - timings_backend
 
+        self.save_queue.join()
+
         self.mode = MODE_PREVIEW
 
         if save_thread.is_alive():
@@ -319,6 +321,8 @@ class Show:
                 timings_write = time.perf_counter()
                 video.write(cv_array)
                 self.timings_write = time.perf_counter() - timings_write
+
+            self.save_queue.task_done()
 
     def toggle_cache(self):
 
